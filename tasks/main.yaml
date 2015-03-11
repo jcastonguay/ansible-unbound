@@ -1,0 +1,20 @@
+- name: Base set of packages
+  apt: pkg={{item}} state=latest
+  with_items:
+   - unbound
+  tags: unbound
+
+- name: Copy /etc/default/unbound
+  action: template src=unbound.default dest=/etc/default/unbound
+          owner=root group=root mode=0644
+  notify:
+    - restart unbound
+  tags: unbound
+
+- name: Copy /etc/resolv.conf to only use local system
+  action: template src=resolv.conf dest=/etc/resolv.conf
+          owner=root group=root mode=0644
+
+- name: Make sure Unbound is running
+  service: name=unbound state=running enabled=yes 
+  tags: unbound
